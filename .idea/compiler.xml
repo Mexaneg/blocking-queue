@@ -2,8 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="blocking-queue.main.main" target="1.8" />
-      <module name="blocking-queue.main.test" target="1.8" />
+      <module name="blocking-queue.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
