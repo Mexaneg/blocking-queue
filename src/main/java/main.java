@@ -1,14 +1,14 @@
-import com.oracle.jrockit.jfr.*;
-import mexaneg.blocking.queue.*;
-import mexaneg.blocking.queue.Producer;
 
-import java.util.*;
+import queue.BlockingQueue;
+
+import java.util.concurrent.*;
 
 public class main {
-    static SomeThing mThing;
+
 
     public static void main(String[] args) throws InterruptedException {
         BlockingQueue<Integer> queue = new BlockingQueue<>();
+        Semaphore S = new Semaphore(1, true);
 
         //  for (int i = 0; i < 2; i++) {
         Thread tr = new Thread(new Runnable() {
@@ -16,7 +16,9 @@ public class main {
             public void run() {
                 try {
                     //Thread.sleep(51);
-                    adding(queue);
+
+                    adding(queue, S);
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -25,19 +27,26 @@ public class main {
 
 
         Thread tr2 = new Thread(new Runnable() {
+            private volatile boolean play = true;
+
             @Override
             public void run() {
                 for (int i = 0; i < 1000; i++) {
+                    try {
+                        S.acquire();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     System.out.println(queue.take());
-
                 }
 
             }
+
         });
         tr.start();
         tr2.start();
@@ -50,11 +59,12 @@ public class main {
         System.out.print(queue.toString());
     }
 
-    static void adding(BlockingQueue<Integer> queue) throws InterruptedException {
+    static void adding(BlockingQueue<Integer> queue, Semaphore S) throws InterruptedException {
 
         for (int i = 0; i < 1000; i++) {
             queue.put(i);
-            Thread.sleep(1);
+            Thread.sleep(20);
+            S.release();
         }
     }
 }
